@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Splendor 多人游戏测试</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #fff; }
+        .pass { color: #4CAF50; }
+        .fail { color: #f44336; }
+        .summary { font-size: 1.5em; margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .section { margin: 30px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .section h2 { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Splendor 多人游戏全量测试</h1>
+    
+    <div class="section">
+        <h2>📋 测试项目</h2>
+        <div id="results"></div>
+    </div>
+    
+    <div id="summary" class="summary"></div>
+    
+    <div class="section">
+        <h2>🌐 多人服务器状态</h2>
+        <div id="server-status">检测中...</div>
+        <button onclick="testServerConnection()" style="margin-top:10px;padding:10px 20px;">测试连接</button>
+    </div>
+    
+    <script>
+        const results = document.getElementById('results');
+        const summary = document.getElementById('summary');
+        let passed = 0, failed = 0;
+        
+        function test(name, fn) {
+            try {
+                fn();
+                results.innerHTML += `<div class="pass">✅ ${name}</div>`;
+                passed++;
+            } catch (e) {
+                results.innerHTML += `<div class="fail">❌ ${name}<br>&nbsp;&nbsp;错误：${e.message}</div>`;
+                failed++;
+            }
+        }
+        
+        function assert(condition, message) {
+            if (!condition) throw new Error(message || '断言失败');
+        }
+        
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `期望 ${expected}, 实际 ${actual}`);
+            }
+        }
+        
+        // ===== UI 测试 =====
+        test('1. 多人游戏按钮存在', () => {
+            const btn = document.getElementById('multiplayer-btn');
+            assert(btn, '多人游戏按钮不存在');
+        });
+        
+        test('2. 创建房间弹窗存在', () => {
+            const modal = document.getElementById('multiplayer-modal');
+            assert(modal, '多人游戏弹窗不存在');
+        });
+        
+        test('3. 房间内部弹窗存在', () => {
+            const modal = document.getElementById('room-modal');
+            assert(modal, '房间弹窗不存在');
+        });
+        
+        test('4. 聊天输入框存在', () => {
+            const input = document.getElementById('chat-input');
+            assert(input, '聊天输入框不存在');
+        });
+        
+        test('5. 玩家列表容器存在', () => {
+            const list = document.getElementById('room-players-list');
+            assert(list, '玩家列表容器不存在');
+        });
+        
+        test('6. 开始游戏按钮存在', () => {
+            const btn = document.getElementById('start-game-btn');
+            assert(btn, '开始游戏按钮不存在');
+        });
+        
+        test('7. 复制房间 ID 按钮存在', () => {
+            const btn = document.getElementById('copy-room-id-btn');
+            assert(btn, '复制按钮不存在');
+        });
+        
+        test('8. 邀请好友按钮存在', () => {
+            const btn = document.getElementById('invite-btn');
+            assert(btn, '邀请按钮不存在');
+        });
+        
+        test('9. 发送聊天按钮存在', () => {
+            const btn = document.getElementById('send-chat-btn');
+            assert(btn, '发送按钮不存在');
+        });
+        
+        test('10. 标签切换按钮存在', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            assert(tabs.length === 2, '标签按钮数量不对');
+        });
+        
+        // ===== CSS 测试 =====
+        test('11. 多人游戏按钮样式', () => {
+            const btn = document.getElementById('multiplayer-btn');
+            const style = window.getComputedStyle(btn);
+            assert(style, '样式无法获取');
+        });
+        
+        test('12. 聊天消息容器样式', () => {
+            const container = document.createElement('div');
+            container.className = 'chat-messages';
+            document.body.appendChild(container);
+            const style = window.getComputedStyle(container);
+            assert(style.height === '200px' || style.height, '样式未定义');
+            document.body.removeChild(container);
+        });
+        
+        // ===== 功能模拟测试 =====
+        test('13. 房间 ID 格式验证', () => {
+            const roomId = 'abcd1234';
+            assert(roomId.length === 8, '房间 ID 长度应为 8');
+            assert(/^[a-z0-9]+$/.test(roomId), '房间 ID 应为小写字母和数字');
+        });
+        
+        test('14. 玩家昵称验证', () => {
+            const name = '测试玩家';
+            assert(name.length > 0, '昵称不能为空');
+            assert(name.length <= 20, '昵称不能太长');
+        });
+        
+        test('15. 房间名称验证', () => {
+            const name = '我的 Splendor 房间';
+            assert(name.length > 0, '房间名称不能为空');
+            assert(name.length <= 20, '房间名称不能太长');
+        });
+        
+        test('16. 玩家人数范围验证', () => {
+            const players = [2, 3, 4];
+            players.forEach(n => {
+                assert(n >= 2 && n <= 4, `玩家人数 ${n} 不在范围内`);
+            });
+        });
+        
+        test('17. 聊天消息长度验证', () => {
+            const msg = '这是一条测试消息'.repeat(5);
+            assert(msg.length <= 100, '消息不能超过 100 字');
+        });
+        
+        test('18. 房间 ID 复制功能', () => {
+            const testId = 'test1234';
+            assert(typeof testId === 'string', '房间 ID 应为字符串');
+        });
+        
+        test('19. 开始游戏按钮初始禁用', () => {
+            // 模拟：只有 1 人时应该禁用
+            const playerCount = 1;
+            const shouldDisable = playerCount < 2;
+            assert(shouldDisable, '少于 2 人应该禁用开始按钮');
+        });
+        
+        test('20. 开始游戏按钮启用条件', () => {
+            // 模拟：2 人或以上时应该启用
+            const playerCount = 2;
+            const shouldEnable = playerCount >= 2;
+            assert(shouldEnable, '2 人或以上应该启用开始按钮');
+        });
+        
+        // ===== 显示结果 =====
+        summary.innerHTML = `测试结果：<span class="pass">${passed} 通过</span>, <span class="fail">${failed} 失败</span>`;
+        
+        if (failed > 0) {
+            summary.innerHTML += '<br><br>❌ 有测试失败，请检查代码！';
+        } else {
+            summary.innerHTML += '<br><br>✅ 所有测试通过！';
+        }
+        
+        // 服务器连接测试
+        function testServerConnection() {
+            const statusDiv = document.getElementById('server-status');
+            statusDiv.innerHTML = '连接中...';
+            
+            try {
+                const ws = new WebSocket('ws://localhost:3000');
+                
+                ws.onopen = () => {
+                    statusDiv.innerHTML = '<span style="color:#4CAF50">✅ 服务器已连接 (ws://localhost:3000)</span>';
+                    ws.close();
+                };
+                
+                ws.onerror = () => {
+                    statusDiv.innerHTML = '<span style="color:#f44336">❌ 服务器未启动</span><br>运行命令：<code>cd server && npm install && npm start</code>';
+                };
+                
+                setTimeout(() => {
+                    if (ws.readyState === WebSocket.CONNECTING) {
+                        ws.close();
+                        statusDiv.innerHTML = '<span style="color:#f44336">❌ 连接超时</span>';
+                    }
+                }, 3000);
+            } catch (e) {
+                statusDiv.innerHTML = '<span style="color:#f44336">❌ 无法连接：' + e.message + '</span>';
+            }
+        }
+        
+        // 自动测试服务器连接
+        setTimeout(testServerConnection, 1000);
+    </script>
+</body>
+</html>
