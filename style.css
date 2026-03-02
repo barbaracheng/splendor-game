@@ -222,15 +222,17 @@ body {
     width: 130px;
     height: 180px;
     border-radius: 12px;
-    padding: 12px;
+    padding: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     border: 2px solid rgba(255,255,255,0.2);
+    overflow: hidden;
 }
 
 .card:hover {
@@ -259,39 +261,46 @@ body {
 
 .card-cost {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-wrap: wrap;
     justify-content: center;
-    min-height: 40px;
+    align-items: center;
+    min-height: 35px;
 }
 
 .cost-gem {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     display: inline-block;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    flex-shrink: 0;
 }
 
 .card-points {
-    font-size: 1.8em;
+    font-size: 1.4em;
     font-weight: bold;
     text-align: center;
     color: var(--primary-gold);
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    line-height: 1.2;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .card-bonus {
     display: flex;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .bonus-gem {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    flex-shrink: 0;
 }
 
 /* ===== Player Section ===== */
@@ -363,8 +372,21 @@ body {
 .player-cards .card {
     width: 90px;
     height: 120px;
-    font-size: 0.85em;
-    padding: 8px;
+    font-size: 0.8em;
+    padding: 6px;
+}
+
+.player-cards .card-points {
+    font-size: 1.2em;
+}
+
+.player-cards .card-cost {
+    min-height: 30px;
+}
+
+.player-cards .cost-gem {
+    width: 16px;
+    height: 16px;
 }
 
 /* ===== Action Panel ===== */
