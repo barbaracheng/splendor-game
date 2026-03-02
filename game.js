@@ -1,7 +1,7 @@
 // Splendor Game UI Controller - 原版规则
 
 class SplendorUI {
-    constructor(playerCount = 2) {
+    constructor(playerCount) {
         this.game = new SplendorGame(playerCount);
         this.selectedGems = [];
         this.selectedCard = null;
@@ -557,10 +557,13 @@ class SplendorUI {
     }
 }
 
-// 启动游戏（默认 2 人）
+// 启动游戏
 let gameUI;
+let selectedPlayers = 2;
+
 document.addEventListener('DOMContentLoaded', () => {
-    gameUI = new SplendorUI(2);
+    // 显示设置弹窗
+    showSetupModal();
     
     // 添加 CSS 动画
     const style = document.createElement('style');
@@ -621,6 +624,97 @@ document.addEventListener('DOMContentLoaded', () => {
             font-style: italic;
             padding: 10px;
         }
+        .setup-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .setup-section label {
+            display: block;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        .player-select {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .player-btn {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,215,0,0.3);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .player-btn:hover, .player-btn.selected {
+            background: rgba(255,215,0,0.2);
+            border-color: #ffd700;
+            transform: scale(1.05);
+        }
+        .setup-info {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .setup-info ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .setup-info li {
+            margin: 8px 0;
+            color: #e0e0e0;
+        }
     `;
     document.head.appendChild(style);
 });
+
+// 显示设置弹窗
+function showSetupModal() {
+    const modal = document.getElementById('setup-modal');
+    modal.classList.remove('hidden');
+    
+    // 玩家选择按钮事件
+    document.querySelectorAll('.player-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedPlayers = parseInt(btn.dataset.players);
+            updateSetupInfo();
+        });
+    });
+    
+    // 默认选中 2 人
+    document.querySelector('[data-players="2"]').classList.add('selected');
+    updateSetupInfo();
+}
+
+// 更新设置信息
+function updateSetupInfo() {
+    const info = document.getElementById('setup-info');
+    const configs = {
+        2: { gems: 4, cards: 4, nobles: 3 },
+        3: { gems: 5, cards: 5, nobles: 4 },
+        4: { gems: 5, cards: 6, nobles: 4 }
+    };
+    const config = configs[selectedPlayers];
+    info.innerHTML = `
+        <p>📊 ${selectedPlayers}人游戏配置：</p>
+        <ul>
+            <li>每种宝石：${config.gems}个</li>
+            <li>每层卡牌：${config.cards}张</li>
+            <li>贵族卡：${config.nobles}张</li>
+        </ul>
+        <button class="btn" onclick="startGame(${selectedPlayers})" style="margin-top:20px;width:100%;">开始游戏</button>
+    `;
+}
+
+// 开始游戏
+function startGame(playerCount) {
+    document.getElementById('setup-modal').classList.add('hidden');
+    gameUI = new SplendorUI(playerCount);
+}

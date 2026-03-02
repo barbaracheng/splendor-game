@@ -25,61 +25,6 @@
             <div class="config-item">👑 贵族卡：<span id="config-nobles">3</span>张</div>
         </div>
 
-        <!-- 卡牌图例说明 -->
-        <div class="card-legend section">
-            <h3>📖 快速入门</h3>
-            <div class="legend-grid">
-                <div class="legend-item">
-                    <div class="legend-card card tier1" style="width:80px;height:100px;margin:0 auto;">
-                        <div class="legend-cost">⚪⚪🔵</div>
-                        <div class="legend-points">⭐</div>
-                        <div class="legend-bonus"><span class="gem gem-green" style="width:20px;height:20px;"></span></div>
-                    </div>
-                    <div class="legend-label">
-                        <strong>上排宝石</strong><br>
-                        <small>购买成本</small>
-                    </div>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-card card tier2" style="width:80px;height:100px;margin:0 auto;">
-                        <div class="legend-cost">🔵🔵🟢</div>
-                        <div class="legend-points">⭐⭐</div>
-                        <div class="legend-bonus"><span class="gem gem-blue" style="width:20px;height:20px;"></span></div>
-                    </div>
-                    <div class="legend-label">
-                        <strong>下排宝石</strong><br>
-                        <small>永久折扣</small>
-                    </div>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-card card tier3" style="width:80px;height:100px;margin:0 auto;">
-                        <div class="legend-cost">🟢🟢</div>
-                        <div class="legend-points">⭐⭐⭐⭐</div>
-                        <div class="legend-bonus"><span class="gem gem-red" style="width:20px;height:20px;"></span></div>
-                    </div>
-                    <div class="legend-label">
-                        <strong>⭐ 星星</strong><br>
-                        <small>胜利点数 (15 分获胜)</small>
-                    </div>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-card card noble" style="width:80px;height:100px;margin:0 auto;">
-                        <div style="font-size:2em;text-align:center;">👑</div>
-                        <div class="legend-cost">⚪⚪⚪🔵🔵🔵</div>
-                        <div class="legend-points">⭐⭐⭐</div>
-                    </div>
-                    <div class="legend-label">
-                        <strong>贵族卡</strong><br>
-                        <small>折扣满足要求自动获得 (3 分)</small>
-                    </div>
-                </div>
-            </div>
-            <div class="legend-tips">
-                <div class="tip">💡 <strong>提示：</strong> 购买卡牌后，下排的宝石颜色会成为你的<strong>永久折扣</strong>，以后买同色卡牌可以少付 1 个宝石</div>
-                <div class="tip">💡 <strong>策略：</strong> 贵族看的是你的<strong>折扣总数</strong>（下排宝石），不是手里的代币！</div>
-            </div>
-        </div>
-
         <!-- 游戏板 -->
         <div class="game-board" style="order: 1;">
             <!-- 宝石池 -->
@@ -246,6 +191,83 @@
                             <li>贵族卡：<span id="rule-nobles">3</span>张</li>
                         </ul>
                     </div>
+                    
+                    <div class="rule-section">
+                        <h3>📖 快速入门 - 卡牌说明</h3>
+                        <div class="legend-grid">
+                            <div class="legend-item">
+                                <div class="legend-card card tier1" style="width:80px;height:100px;margin:0 auto;">
+                                    <div class="legend-cost">⚪⚪🔵</div>
+                                    <div class="legend-points">⭐1</div>
+                                    <div class="legend-bonus"><span class="gem gem-green" style="width:20px;height:20px;display:inline-block;margin:0 auto;"></span></div>
+                                </div>
+                                <div class="legend-label">
+                                    <strong>上排宝石</strong><br>
+                                    <small>购买成本</small>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-card card tier2" style="width:80px;height:100px;margin:0 auto;">
+                                    <div class="legend-cost">🔵🔵🟢</div>
+                                    <div class="legend-points">⭐2</div>
+                                    <div class="legend-bonus"><span class="gem gem-blue" style="width:20px;height:20px;display:inline-block;margin:0 auto;"></span></div>
+                                </div>
+                                <div class="legend-label">
+                                    <strong>下排宝石</strong><br>
+                                    <small>永久折扣</small>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-card card tier3" style="width:80px;height:100px;margin:0 auto;">
+                                    <div class="legend-cost">🟢🟢</div>
+                                    <div class="legend-points">⭐4</div>
+                                    <div class="legend-bonus"><span class="gem gem-red" style="width:20px;height:20px;display:inline-block;margin:0 auto;"></span></div>
+                                </div>
+                                <div class="legend-label">
+                                    <strong>⭐ 星星</strong><br>
+                                    <small>胜利点数 (15 分获胜)</small>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-card card noble" style="width:80px;height:100px;margin:0 auto;">
+                                    <div style="font-size:2em;text-align:center;">👑</div>
+                                    <div class="legend-cost">⚪⚪⚪🔵🔵🔵</div>
+                                    <div class="legend-points">⭐3</div>
+                                </div>
+                                <div class="legend-label">
+                                    <strong>贵族卡</strong><br>
+                                    <small>折扣满足要求自动获得</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="legend-tips">
+                            <div class="tip">💡 <strong>提示：</strong> 购买卡牌后，下排的宝石颜色会成为你的<strong>永久折扣</strong>，以后买同色卡牌可以少付 1 个宝石</div>
+                            <div class="tip">💡 <strong>策略：</strong> 贵族看的是你的<strong>折扣总数</strong>（下排宝石数量），不是手里的代币！</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新游戏设置弹窗 -->
+        <div id="setup-modal" class="modal">
+            <div class="modal-content">
+                <h2>🎮 新游戏设置</h2>
+                <div class="setup-section">
+                    <label>👥 玩家人数：</label>
+                    <div class="player-select">
+                        <button class="player-btn" data-players="2">2 人</button>
+                        <button class="player-btn" data-players="3">3 人</button>
+                        <button class="player-btn" data-players="4">4 人</button>
+                    </div>
+                </div>
+                <div class="setup-info" id="setup-info">
+                    <p>📊 2 人游戏配置：</p>
+                    <ul>
+                        <li>每种宝石：4 个</li>
+                        <li>每层卡牌：4 张</li>
+                        <li>贵族卡：3 张</li>
+                    </ul>
                 </div>
             </div>
         </div>
