@@ -291,12 +291,20 @@ class SplendorUI {
     take3DifferentGems() {
         this.updateMessage('👆 请点击选择 3 个不同颜色的宝石');
         this.selectedGems = [];
+        // 激活宝石点击
+        document.querySelectorAll('.gem-slot').forEach(slot => {
+            slot.style.pointerEvents = 'auto';
+        });
     }
 
     // 拿取 2 个相同宝石
     take2SameGems() {
         this.updateMessage('👆 请点击选择 1 种颜色的宝石（该颜色需≥4 个）');
         this.selectedGems = [];
+        // 激活宝石点击
+        document.querySelectorAll('.gem-slot').forEach(slot => {
+            slot.style.pointerEvents = 'auto';
+        });
     }
 
     // 预订卡牌
