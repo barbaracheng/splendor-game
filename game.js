@@ -15,6 +15,11 @@ class SplendorUI {
         this.renderPlayers();
         this.bindEvents();
         this.updateMessage('🎮 游戏开始！玩家 1 的回合 - 请选择行动');
+        // 初始化按钮状态 - 拿取宝石按钮应该可用
+        document.getElementById('take-3-different').disabled = false;
+        document.getElementById('take-2-same').disabled = false;
+        document.getElementById('buy-card').disabled = true;
+        document.getElementById('reserve-card').disabled = true;
     }
 
     // 渲染宝石池
