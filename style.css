@@ -69,6 +69,108 @@ body {
     font-size: 1.2em;
 }
 
+/* 卡牌图例说明 */
+.card-legend {
+    margin-bottom: 20px;
+}
+
+.card-legend h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+}
+
+.legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+.legend-card {
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.legend-cost {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 30px;
+    margin-bottom: 5px;
+}
+
+.legend-points {
+    font-size: 1.2em;
+    text-align: center;
+    color: var(--primary-gold);
+    margin: 5px 0;
+}
+
+.legend-bonus {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.legend-label {
+    font-size: 0.95em;
+    color: #e0e0e0;
+}
+
+.legend-label strong {
+    color: var(--primary-gold);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.legend-label small {
+    color: #aaa;
+    font-size: 0.85em;
+}
+
+.legend-tips {
+    background: rgba(33,150,243,0.15);
+    border-left: 4px solid var(--accent-blue);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.tip {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: #e3f2fd;
+}
+
+.tip strong {
+    color: var(--primary-gold);
+}
+
+@media (max-width: 768px) {
+    .legend-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .legend-card {
+        width: 70px !important;
+        height: 90px !important;
+    }
+    
+    .legend-label {
+        font-size: 0.8em;
+    }
+}
+
 .game-header h1 {
     font-size: 2.2em;
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
