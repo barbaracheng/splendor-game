@@ -97,6 +97,37 @@ body {
 .legend-card {
     margin-bottom: 10px;
     position: relative;
+    width: 80px !important;
+    height: 100px !important;
+    padding: 8px !important;
+    font-size: 0.7em !important;
+}
+
+.legend-cost {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 25px;
+    margin-bottom: 3px;
+}
+
+.legend-points {
+    font-size: 1em;
+    text-align: center;
+    color: var(--primary-gold);
+    margin: 3px 0;
+}
+
+.legend-bonus {
+    display: flex;
+    justify-content: center;
+    margin-top: 3px;
+}
+
+.legend-bonus .gem {
+    width: 18px !important;
+    height: 18px !important;
 }
 
 .legend-cost {
@@ -221,6 +252,24 @@ body {
 
 .btn-rules:hover {
     background: linear-gradient(135deg, #ba68c8, #9c27b0);
+}
+
+.btn-quickstart {
+    background: linear-gradient(135deg, #00bcd4, #0097a7);
+}
+
+.btn-quickstart:hover {
+    background: linear-gradient(135deg, #26c6da, #00bcd4);
+}
+
+.btn-toggle {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    background: rgba(255,255,255,0.1);
+}
+
+.btn-toggle:hover {
+    background: rgba(255,255,255,0.2);
 }
 
 .action-btn {
@@ -457,6 +506,33 @@ body {
     z-index: 100;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(10px);
+}
+
+.action-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.action-panel-header h2 {
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.action-panel-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.action-panel.collapsed .action-panel-content {
+    max-height: 0;
+    opacity: 0;
+}
+
+.action-panel:not(.collapsed) .action-panel-content {
+    max-height: 500px;
+    opacity: 1;
 }
 
 .player-section {

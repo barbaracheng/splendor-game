@@ -281,9 +281,22 @@ class SplendorUI {
 
     // 绑定事件
     bindEvents() {
+        // 快速入门按钮
+        document.getElementById('quickstart-btn').addEventListener('click', () => {
+            document.getElementById('quickstart-modal').classList.remove('hidden');
+        });
+
         // 规则按钮
         document.getElementById('rules-btn').addEventListener('click', () => {
             document.getElementById('rules-modal').classList.remove('hidden');
+        });
+
+        // 行动面板折叠
+        document.getElementById('toggle-action-panel').addEventListener('click', () => {
+            const panel = document.querySelector('.action-panel');
+            const btn = document.getElementById('toggle-action-panel');
+            panel.classList.toggle('collapsed');
+            btn.textContent = panel.classList.contains('collapsed') ? '▼ 展开' : '▲ 收起';
         });
 
         // 新游戏按钮

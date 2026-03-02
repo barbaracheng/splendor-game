@@ -12,7 +12,8 @@
             <h1>💎 Splendor 璀璨宝石</h1>
             <div class="game-info">
                 <span id="current-player">🎯 玩家 1 的回合</span>
-                <button id="rules-btn" class="btn btn-rules">📖 游戏规则</button>
+                <button id="quickstart-btn" class="btn btn-quickstart">📖 快速入门</button>
+                <button id="rules-btn" class="btn btn-rules">📜 完整规则</button>
                 <button id="new-game-btn" class="btn">🔄 新游戏</button>
             </div>
         </header>
@@ -109,13 +110,20 @@
 
         <!-- 行动面板 -->
         <div class="action-panel section" style="order: 3;">
-            <h2>🎯 行动（四选一）</h2>
-            <div class="actions-container">
-                <button class="action-btn" id="take-3-different">🔹 拿取 3 个不同宝石</button>
-                <button class="action-btn" id="take-2-same">🔸 拿取 2 个相同宝石</button>
-                <button class="action-btn" id="reserve-card" disabled>🃏 预订卡牌</button>
-                <button class="action-btn" id="buy-card" disabled>💰 购买卡牌</button>
+            <div class="action-panel-header">
+                <h2>🎯 行动（四选一）</h2>
+                <button id="toggle-action-panel" class="btn btn-toggle">▲ 收起</button>
             </div>
+            <div class="action-panel-content">
+                <div class="actions-container">
+                    <button class="action-btn" id="take-3-different">🔹 拿取 3 个不同宝石</button>
+                    <button class="action-btn" id="take-2-same">🔸 拿取 2 个相同宝石</button>
+                    <button class="action-btn" id="reserve-card" disabled>🃏 预订卡牌</button>
+                    <button class="action-btn" id="buy-card" disabled>💰 购买卡牌</button>
+                </div>
+                <div id="message-area" class="message-area"></div>
+            </div>
+        </div>
             <div id="message-area" class="message-area"></div>
         </div>
 
@@ -249,6 +257,66 @@
             </div>
         </div>
         
+        <!-- 快速入门弹窗 -->
+        <div id="quickstart-modal" class="modal hidden">
+            <div class="modal-content rules-content">
+                <button class="btn rules-close-btn" onclick="document.getElementById('quickstart-modal').classList.add('hidden')">✕ 关闭</button>
+                <h2>📖 快速入门</h2>
+                <div class="rules-scroll">
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <div class="legend-card card tier1">
+                                <div class="legend-cost">⚪⚪🔵</div>
+                                <div class="legend-points">⭐1</div>
+                                <div class="legend-bonus"><span class="gem gem-green"></span></div>
+                            </div>
+                            <div class="legend-label">
+                                <strong>上排宝石</strong><br>
+                                <small>购买成本</small>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-card card tier2">
+                                <div class="legend-cost">🔵🔵🟢</div>
+                                <div class="legend-points">⭐2</div>
+                                <div class="legend-bonus"><span class="gem gem-blue"></span></div>
+                            </div>
+                            <div class="legend-label">
+                                <strong>下排宝石</strong><br>
+                                <small>永久折扣</small>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-card card tier3">
+                                <div class="legend-cost">🟢🟢</div>
+                                <div class="legend-points">⭐4</div>
+                                <div class="legend-bonus"><span class="gem gem-red"></span></div>
+                            </div>
+                            <div class="legend-label">
+                                <strong>⭐星星</strong><br>
+                                <small>15 分获胜</small>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-card card noble">
+                                <div style="font-size:2em;text-align:center;">👑</div>
+                                <div class="legend-cost">⚪⚪⚪🔵🔵🔵</div>
+                                <div class="legend-points">⭐3</div>
+                            </div>
+                            <div class="legend-label">
+                                <strong>贵族卡</strong><br>
+                                <small>自动获得</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-tips">
+                        <div class="tip">💡 <strong>提示：</strong> 购买卡牌后，下排的宝石颜色会成为你的<strong>永久折扣</strong></div>
+                        <div class="tip">💡 <strong>策略：</strong> 贵族看的是你的<strong>折扣总数</strong>，不是手里的代币！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 新游戏设置弹窗 -->
         <div id="setup-modal" class="modal">
             <div class="modal-content">
