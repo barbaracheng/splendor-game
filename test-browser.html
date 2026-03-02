@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Splendor 测试</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #fff; }
+        .pass { color: #4CAF50; }
+        .fail { color: #f44336; }
+        .summary { font-size: 1.5em; margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Splendor 游戏测试</h1>
+    <div id="results"></div>
+    <div id="summary" class="summary"></div>
+    
+    <script src="splendor-core.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        const summary = document.getElementById('summary');
+        let passed = 0, failed = 0;
+        
+        function test(name, fn) {
+            try {
+                fn();
+                results.innerHTML += `<div class="pass">✅ ${name}</div>`;
+                passed++;
+            } catch (e) {
+                results.innerHTML += `<div class="fail">❌ ${name}<br>&nbsp;&nbsp;错误：${e.message}</div>`;
+                failed++;
+            }
+        }
+        
+        function assert(condition, message) {
+            if (!condition) throw new Error(message || '断言失败');
+        }
+        
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `期望 ${expected}, 实际 ${actual}`);
+            }
+        }
+        
+        // ===== 测试用例 =====
+        
+        test('2 人游戏初始化', () => {
+            const game = new SplendorGame(2);
+            assertEqual(game.playerCount, 2);
+            assertEqual(game.gemCount, 4);
+            assertEqual(game.cardsPerTier, 4);
+            assertEqual(game.nobleCount, 3);
+            assertEqual(game.bank.gold, 5);
+        });
+        
+        test('3 人游戏初始化', () => {
+            const game = new SplendorGame(3);
+            assertEqual(game.playerCount, 3);
+            assertEqual(game.gemCount, 5);
+            assertEqual(game.cardsPerTier, 5);
+            assertEqual(game.nobleCount, 4);
+        });
+        
+        test('4 人游戏初始化', () => {
+            const game = new SplendorGame(4);
+            assertEqual(game.playerCount, 4);
+            assertEqual(game.gemCount, 5);
+            assertEqual(game.cardsPerTier, 6);
+            assertEqual(game.nobleCount, 4);
+        });
+        
+        test('购买卡牌 - 有足够宝石', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.gems.white = 4;
+            player.gems.blue = 4;
+            const card = game.tier1Cards.find(c => c.cost.white === 4);
+            if (card) {
+                const result = game.buyCard(0, card);
+                assertEqual(result.success, true);
+            }
+        });
+        
+        test('购买卡牌 - 宝石不足', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.gems.white = 1;
+            const card = game.tier1Cards.find(c => c.cost.white === 4);
+            if (card) {
+                const canAfford = game.canAffordCard(0, card);
+                assertEqual(canAfford, false);
+            }
+        });
+        
+        test('购买卡牌 - 使用折扣', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.cards.push({ color: 'white', points: 0 });
+            game.updateBonuses(0);
+            assertEqual(player.bonuses.white, 1);
+        });
+        
+        test('购买卡牌 - 使用金色代币', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.gems.gold = 5;
+            const card = game.tier1Cards.find(c => c.cost.white === 4);
+            if (card) {
+                const canAfford = game.canAffordCard(0, card);
+                assertEqual(canAfford, true);
+            }
+        });
+        
+        test('拿取 3 个不同宝石', () => {
+            const game = new SplendorGame(2);
+            const result = game.takeGems({ white: 1, blue: 1, green: 1 });
+            assertEqual(result.success, true);
+        });
+        
+        test('拿取 2 个相同宝石', () => {
+            const game = new SplendorGame(2);
+            const result = game.takeGems({ white: 2 });
+            assertEqual(result.success, true);
+        });
+        
+        test('拿取宝石 - 不能拿金色', () => {
+            const game = new SplendorGame(2);
+            const result = game.takeGems({ gold: 3 });
+            assertEqual(result.success, false);
+        });
+        
+        test('宝石上限 10 个', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.gems.white = 4;
+            player.gems.blue = 4;
+            player.gems.green = 4;
+            const result = game.checkGemLimit(player);
+            assertEqual(result.returned, 2);
+        });
+        
+        test('金色宝石不计入上限', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.gems.white = 4;
+            player.gems.blue = 3;
+            player.gems.green = 3;
+            player.gems.gold = 5;
+            const result = game.checkGemLimit(player);
+            assertEqual(result.returned, 0);
+        });
+        
+        test('预留卡牌', () => {
+            const game = new SplendorGame(2);
+            const card = game.tier1Cards[0];
+            const result = game.reserveCard(0, card, 'tier1');
+            assertEqual(result.success, true);
+        });
+        
+        test('预留卡牌 - 达到上限', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.reservedCards = [{}, {}, {}];
+            const result = game.reserveCard(0, game.tier1Cards[0], 'tier1');
+            assertEqual(result.success, false);
+        });
+        
+        test('贵族拜访 - 基于折扣', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            for (let i = 0; i < 3; i++) {
+                player.cards.push({ color: 'white', points: 0 });
+            }
+            game.updateBonuses(0);
+            assertEqual(player.bonuses.white, 3);
+        });
+        
+        test('游戏结束 - 达到 15 分', () => {
+            const game = new SplendorGame(2);
+            const player = game.players[0];
+            player.points = 15;
+            game.checkGameOver(0);
+            assertEqual(game.gameOver, true);
+        });
+        
+        // ===== 显示结果 =====
+        summary.innerHTML = `测试结果：<span class="pass">${passed} 通过</span>, <span class="fail">${failed} 失败</span>`;
+        
+        if (failed > 0) {
+            summary.innerHTML += '<br><br>❌ 有测试失败，请检查代码！';
+        } else {
+            summary.innerHTML += '<br><br>✅ 所有测试通过！';
+        }
+    </script>
+</body>
+</html>

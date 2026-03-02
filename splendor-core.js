@@ -301,13 +301,39 @@ class SplendorGame {
       totalNeeded += cost;
     });
     
-    // 检查玩家是否有足够的宝石（包括金色）
-    let totalGems = 0;
-    Object.values(player.gems).forEach(count => {
-      totalGems += count;
+    if (totalNeeded === 0) return true; // 免费卡牌
+    
+    // 计算玩家可用的宝石（包括金色）
+    let availableNonGold = 0;
+    const colors = ['white', 'blue', 'green', 'red', 'black'];
+    colors.forEach(color => {
+      availableNonGold += player.gems[color];
     });
     
-    return totalGems >= totalNeeded;
+    const availableGold = player.gems.gold;
+    const totalAvailable = availableNonGold + availableGold;
+    
+    // 首先检查总数是否足够
+    if (totalAvailable < totalNeeded) {
+      return false;
+    }
+    
+    // 检查是否能实际支付（考虑金色只能作为万能）
+    // 计算非金色宝石能支付多少
+    let nonGoldPayment = 0;
+    colors.forEach(color => {
+      nonGoldPayment += Math.min(player.gems[color], actualCost[color]);
+    });
+    
+    // 剩余需要用金色支付的部分
+    const remainingNeeded = totalNeeded - nonGoldPayment;
+    
+    // 检查金色是否足够支付剩余部分
+    if (remainingNeeded > availableGold) {
+      return false;
+    }
+    
+    return true;
   }
 
   // 购买卡牌

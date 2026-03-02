@@ -254,13 +254,29 @@ class SplendorUI {
         }
         
         const canAfford = this.game.canAffordCard(this.game.currentPlayer, card);
+        const actualCost = this.game.calculateActualCost(this.game.currentPlayer, card);
+        
+        // 显示实际成本
+        const costText = this.formatCost(actualCost);
         const message = canAfford 
-            ? `✨ 已选择 ${tier} 卡牌 - 可以购买！` 
-            : `💰 宝石不足 - 当前无法购买`;
+            ? `✨ 已选择 ${tier} 卡牌 - 可以购买！成本：${costText}` 
+            : `💰 宝石不足 - 当前无法购买（成本：${costText}）`;
         this.updateMessage(message);
         
         document.getElementById('buy-card').disabled = false;
         document.getElementById('reserve-card').disabled = false;
+    }
+
+    // 格式化成本显示
+    formatCost(cost) {
+        const gemNames = { white: '⚪', blue: '🔵', green: '🟢', red: '🔴', black: '⚫', gold: '🟡' };
+        let text = '';
+        for (const [color, amount] of Object.entries(cost)) {
+            if (amount > 0) {
+                text += `${gemNames[color]}${amount} `;
+            }
+        }
+        return text.trim() || '免费';
     }
 
     // 绑定事件
