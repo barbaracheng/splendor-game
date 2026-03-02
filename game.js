@@ -91,7 +91,7 @@ class SplendorUI {
 
         el.innerHTML = `
             <div class="card-cost">${costHtml}</div>
-            <div class="card-points">${card.points > 0 ? '⭐'.repeat(card.points) : ''}</div>
+            <div class="card-points">${card.points > 0 ? `⭐${card.points}` : ''}</div>
             <div class="card-bonus">
                 ${card.color ? `<span class="bonus-gem gem-${card.color}" title="${gemNames[card.color]}折扣"></span>` : ''}
             </div>
