@@ -494,15 +494,27 @@ body {
 
 .rules-content {
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
 }
 
 .rules-scroll {
-    max-height: 60vh;
+    flex: 1;
     overflow-y: auto;
     margin: 20px 0;
     padding: 20px;
     background: rgba(0,0,0,0.3);
     border-radius: 10px;
+    max-height: 60vh;
+}
+
+.rules-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 2px solid rgba(255,215,0,0.3);
+    margin-top: 10px;
 }
 
 .rule-section {
