@@ -46,6 +46,29 @@ body {
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
+/* 游戏配置显示 */
+.game-config {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.config-item {
+    background: rgba(255,215,0,0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,215,0,0.3);
+    font-weight: bold;
+}
+
+.config-item span {
+    color: var(--primary-gold);
+    font-size: 1.2em;
+}
+
 .game-header h1 {
     font-size: 2.2em;
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
@@ -88,6 +111,14 @@ body {
 .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76,175,80,0.4);
+}
+
+.btn-rules {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+.btn-rules:hover {
+    background: linear-gradient(135deg, #ba68c8, #9c27b0);
 }
 
 .action-btn {
@@ -339,13 +370,13 @@ body {
 
 .player-stats {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     margin-bottom: 15px;
     flex-wrap: wrap;
 }
 
-.points {
-    font-size: 1.4em;
+.points, .cards-count {
+    font-size: 1.2em;
     color: var(--primary-gold);
     font-weight: bold;
     padding: 8px 15px;
@@ -456,6 +487,55 @@ body {
     border: 3px solid var(--primary-gold);
     box-shadow: 0 0 50px rgba(255,215,0,0.3);
     animation: modalPop 0.5s ease;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.rules-content {
+    text-align: left;
+}
+
+.rules-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+.rule-section {
+    margin-bottom: 25px;
+}
+
+.rule-section h3 {
+    color: var(--primary-gold);
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+
+.rule-section p, .rule-section ul, .rule-section ol {
+    line-height: 1.8;
+    color: #e0e0e0;
+}
+
+.rule-section ul, .rule-section ol {
+    padding-left: 20px;
+}
+
+.rule-section li {
+    margin: 8px 0;
+}
+
+#config-list {
+    list-style: none;
+    padding: 0;
+}
+
+#config-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 @keyframes modalPop {

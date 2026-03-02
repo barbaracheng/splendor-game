@@ -11,10 +11,19 @@
         <header class="game-header">
             <h1>💎 Splendor 璀璨宝石</h1>
             <div class="game-info">
-                <span id="current-player">当前玩家：玩家 1</span>
-                <button id="new-game-btn" class="btn">新游戏</button>
+                <span id="current-player">🎯 玩家 1 的回合</span>
+                <button id="rules-btn" class="btn btn-rules">📖 游戏规则</button>
+                <button id="new-game-btn" class="btn">🔄 新游戏</button>
             </div>
         </header>
+
+        <!-- 游戏配置显示 -->
+        <div class="game-config section">
+            <div class="config-item">👥 玩家：<span id="config-players">2</span></div>
+            <div class="config-item">💎 每种宝石：<span id="config-gems">4</span>个</div>
+            <div class="config-item">🎴 每层卡牌：<span id="config-cards">4</span>张</div>
+            <div class="config-item">👑 贵族卡：<span id="config-nobles">3</span>张</div>
+        </div>
 
         <!-- 游戏板 -->
         <div class="game-board" style="order: 1;">
@@ -51,7 +60,7 @@
 
             <!-- 贵族卡 -->
             <div class="nobles-section section">
-                <h2>👑 贵族卡</h2>
+                <h2>👑 贵族卡（每张 3 分）</h2>
                 <div class="cards-container" id="nobles-container"></div>
             </div>
 
@@ -62,11 +71,11 @@
                     <div class="cards-container" id="tier3-container"></div>
                 </div>
                 <div class="tier" id="tier2">
-                    <h3>Tier 2 (1-3 分)</h3>
+                    <h3>Tier 2 (2-3 分)</h3>
                     <div class="cards-container" id="tier2-container"></div>
                 </div>
                 <div class="tier" id="tier1">
-                    <h3>Tier 1 (0 分)</h3>
+                    <h3>Tier 1 (0-1 分)</h3>
                     <div class="cards-container" id="tier1-container"></div>
                 </div>
             </div>
@@ -77,31 +86,113 @@
             <div class="player-section section" id="player-0">
                 <h3>🎮 玩家 1</h3>
                 <div class="player-stats">
-                    <span class="points">得分：<span id="p0-points">0</span></span>
+                    <span class="points">⭐ 得分：<span id="p0-points">0</span></span>
+                    <span class="cards-count">🎴 卡牌：<span id="p0-cards-count">0</span></span>
                 </div>
                 <div class="player-gems" id="p0-gems"></div>
+                <div class="player-bonuses" id="p0-bonuses"></div>
                 <div class="player-cards" id="p0-cards"></div>
+                <div class="player-reserved" id="p0-reserved"></div>
             </div>
             <div class="player-section section" id="player-1">
                 <h3>🎮 玩家 2</h3>
                 <div class="player-stats">
-                    <span class="points">得分：<span id="p1-points">0</span></span>
+                    <span class="points">⭐ 得分：<span id="p1-points">0</span></span>
+                    <span class="cards-count">🎴 卡牌：<span id="p1-cards-count">0</span></span>
                 </div>
                 <div class="player-gems" id="p1-gems"></div>
+                <div class="player-bonuses" id="p1-bonuses"></div>
                 <div class="player-cards" id="p1-cards"></div>
+                <div class="player-reserved" id="p1-reserved"></div>
             </div>
         </div>
 
         <!-- 行动面板 -->
         <div class="action-panel section" style="order: 3;">
-            <h2>🎯 行动</h2>
+            <h2>🎯 行动（四选一）</h2>
             <div class="actions-container">
-                <button class="action-btn" id="take-3-different">拿取 3 个不同宝石</button>
-                <button class="action-btn" id="take-2-same">拿取 2 个相同宝石</button>
-                <button class="action-btn" id="reserve-card" disabled>预订卡牌</button>
-                <button class="action-btn" id="buy-card" disabled>购买卡牌</button>
+                <button class="action-btn" id="take-3-different">🔹 拿取 3 个不同宝石</button>
+                <button class="action-btn" id="take-2-same">🔸 拿取 2 个相同宝石</button>
+                <button class="action-btn" id="reserve-card" disabled>🃏 预订卡牌</button>
+                <button class="action-btn" id="buy-card" disabled>💰 购买卡牌</button>
             </div>
             <div id="message-area" class="message-area"></div>
+        </div>
+
+        <!-- 游戏规则弹窗 -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-content rules-content">
+                <h2>📖 游戏规则</h2>
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎯 游戏目标</h3>
+                        <p>成为第一个获得 <strong>15 分</strong> 的玩家！分数来自发展卡和贵族卡。</p>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>💎 宝石说明</h3>
+                        <ul>
+                            <li><strong>5 种颜色：</strong>白、蓝、绿、红、黑</li>
+                            <li><strong>金色代币：</strong>万能宝石，可当作任何颜色使用</li>
+                            <li>手中最多持有 <strong>10 个宝石</strong>（金色除外）</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🎴 卡牌说明</h3>
+                        <ul>
+                            <li><strong>Tier 1：</strong>0-1 分，成本低</li>
+                            <li><strong>Tier 2：</strong>2-3 分，成本中等</li>
+                            <li><strong>Tier 3：</strong>4-5 分，成本高</li>
+                            <li>购买卡牌后获得对应颜色的 <strong>永久折扣</strong></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>👑 贵族卡</h3>
+                        <p>当你的 <strong>卡牌折扣总数</strong> 满足贵族要求时，自动获得贵族卡（每张 3 分）。</p>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🎮 每回合行动（四选一）</h3>
+                        <ol>
+                            <li><strong>拿取 3 个不同宝石</strong> - 选择 3 种不同颜色各 1 个</li>
+                            <li><strong>拿取 2 个相同宝石</strong> - 选择 1 种颜色 2 个（该颜色桌上需≥4 个）</li>
+                            <li><strong>预订卡牌</strong> - 选择 1 张卡牌预留，并获得 1 个金色代币</li>
+                            <li><strong>购买卡牌</strong> - 购买桌面卡牌或自己的预留卡牌</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>💰 购买规则</h3>
+                        <ul>
+                            <li>使用已购卡牌的 <strong>颜色折扣</strong> 减免成本</li>
+                            <li>金色代币可当作任何颜色使用</li>
+                            <li>可以购买自己预留的卡牌</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🏆 游戏结束</h3>
+                        <ul>
+                            <li>有玩家达到 15 分时，完成当前轮次（所有玩家回合数相同）</li>
+                            <li>分数高者获胜</li>
+                            <li>平局时：已购卡牌数量少者胜</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>⚙️ 当前局设置</h3>
+                        <ul id="config-list">
+                            <li>玩家人数：<span id="rule-players">2</span>人</li>
+                            <li>每种宝石：<span id="rule-gems">4</span>个</li>
+                            <li>每层卡牌：<span id="rule-cards">4</span>张</li>
+                            <li>贵族卡：<span id="rule-nobles">3</span>张</li>
+                        </ul>
+                    </div>
+                </div>
+                <button class="btn" onclick="document.getElementById('rules-modal').classList.add('hidden')">关闭</button>
+            </div>
         </div>
 
         <!-- 游戏结束弹窗 -->
@@ -109,6 +200,7 @@
             <div class="modal-content">
                 <h2>🎉 游戏结束!</h2>
                 <p id="winner-text"></p>
+                <div id="final-scores"></div>
                 <button class="btn" onclick="location.reload()">再来一局</button>
             </div>
         </div>
