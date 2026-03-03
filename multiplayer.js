@@ -12,9 +12,9 @@ class SplendorMultiplayer {
     }
     
     initUI() {
-        // 多人游戏按钮
+        // 多人游戏按钮 - 跳转到对战大厅
         document.getElementById('multiplayer-btn')?.addEventListener('click', () => {
-            document.getElementById('multiplayer-modal').classList.remove('hidden');
+            window.location.href = 'lobby.html';
         });
         
         // 标签切换
@@ -139,9 +139,24 @@ class SplendorMultiplayer {
                 this.startGame(data.roomState);
                 break;
                 
+            case 'game_action':
+                this.handleGameAction(data);
+                break;
+                
             case 'error':
                 alert(data.message);
                 break;
+        }
+    }
+    
+    // 处理游戏动作
+    handleGameAction(data) {
+        if (window.gameUI) {
+            // 更新游戏状态
+            if (data.gameState) {
+                window.gameUI.game = Object.assign(window.gameUI.game, data.gameState);
+                window.gameUI.renderGame();
+            }
         }
     }
     
@@ -183,7 +198,7 @@ class SplendorMultiplayer {
         if (!list) return;
         
         list.innerHTML = this.players.map((player, index) => `
-            <div class="player-item">
+            <div class="player-item ${player.id === this.playerId ? 'you' : ''}">
                 <div class="player-avatar">${index + 1}</div>
                 <div class="player-name">${player.name || '未知'}</div>
                 ${player.id === this.playerId ? '<span class="player-status">👤 你</span>' : ''}
@@ -194,6 +209,30 @@ class SplendorMultiplayer {
         const startBtn = document.getElementById('start-game-btn');
         if (startBtn) {
             startBtn.disabled = this.players.length < 2;
+        }
+        
+        // 更新游戏状态
+        this.updateGameStatus();
+    }
+    
+    updateGameStatus() {
+        const roomBody = document.querySelector('.room-body');
+        if (!roomBody) return;
+        
+        // 检查是否已存在状态元素
+        let statusElement = document.querySelector('.game-status');
+        if (!statusElement) {
+            statusElement = document.createElement('div');
+            statusElement.className = 'game-status';
+            roomBody.insertBefore(statusElement, roomBody.firstChild);
+        }
+        
+        if (this.players.length < 2) {
+            statusElement.className = 'game-status waiting';
+            statusElement.textContent = `等待其他玩家加入... (${this.players.length}/4)`;
+        } else {
+            statusElement.className = 'game-status ready';
+            statusElement.textContent = `准备就绪！(${this.players.length}/4) 点击开始游戏`;
         }
     }
     
@@ -212,9 +251,10 @@ class SplendorMultiplayer {
         if (!container) return;
         
         const time = new Date(timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        const isSystem = sender === '系统';
         
         container.innerHTML += `
-            <div class="chat-message">
+            <div class="chat-message ${isSystem ? 'system' : ''}">
                 <div class="sender">${sender} <span class="time">${time}</span></div>
                 <div class="text">${text}</div>
             </div>
@@ -227,7 +267,12 @@ class SplendorMultiplayer {
         document.getElementById('room-modal').classList.add('hidden');
         // 初始化游戏逻辑
         alert(`游戏即将开始！\n房间：${this.roomId}\n玩家：${this.players.length}人`);
-        // TODO: 初始化实际游戏
+        
+        // 初始化游戏
+        startGame(this.players.length);
+        
+        // 发送游戏开始消息给其他玩家
+        this.send({ type: 'game_started', roomState });
     }
     
     leaveRoom() {

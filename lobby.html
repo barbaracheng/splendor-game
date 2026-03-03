@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splendor - 多人对战大厅</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .lobby-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .lobby-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .lobby-header h1 {
+            font-size: 2.2em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, var(--primary-gold), #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(76,175,80,0.2), rgba(76,175,80,0.1));
+            border-radius: 25px;
+            border: 2px solid rgba(76,175,80,0.4);
+            font-weight: bold;
+            color: #81c784;
+        }
+
+        .online-dot {
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(255,152,0,0.2), rgba(255,152,0,0.1));
+            border-radius: 25px;
+            border: 2px solid rgba(255,152,0,0.4);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 10px rgba(255,152,0,0.3);
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #ffb74d;
+        }
+
+        .lobby-body {
+            display: grid;
+            grid-template-columns: 1fr 350px 300px;
+            gap: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .lobby-section {
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .lobby-section h2 {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+            color: var(--primary-gold);
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(33,150,243,0.4);
+        }
+
+        .room-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .room-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            border-radius: 12px;
+            border: 2px solid rgba(255,152,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, rgba(255,152,0,0.15), rgba(255,152,0,0.05));
+            border-color: rgba(255,152,0,0.5);
+            box-shadow: 0 4px 20px rgba(255,152,0,0.2);
+        }
+
+        .room-item.full {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .room-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .room-name {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .room-id {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .room-players {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,152,0,0.15);
+            border-radius: 20px;
+            font-weight: bold;
+            color: #ffb74d;
+        }
+
+        .room-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .room-status.waiting {
+            background: linear-gradient(135deg, rgba(76,175,80,0.3), rgba(76,175,80,0.2));
+            color: #81c784;
+            border: 1px solid rgba(76,175,80,0.5);
+        }
+
+        .room-status.playing {
+            background: linear-gradient(135deg, rgba(244,67,54,0.3), rgba(244,67,54,0.2));
+            color: #e57373;
+            border: 1px solid rgba(244,67,54,0.5);
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .player-item:hover {
+            background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(33,150,243,0.05));
+            border-color: rgba(33,150,243,0.3);
+            transform: translateX(3px);
+        }
+
+        .player-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .player-details {
+            flex: 1;
+        }
+
+        .player-name-small {
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.95em;
+        }
+
+        .player-status-small {
+            font-size: 0.8em;
+            color: #81c784;
+        }
+
+        .player-status-small.in-game {
+            color: #e57373;
+        }
+
+        .invite-btn {
+            padding: 6px 12px;
+            font-size: 0.8em;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .invite-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(156,39,176,0.4);
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quick-match-section {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .quick-match-btn {
+            width: 100%;
+            padding: 25px;
+            font-size: 1.4em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            box-shadow: 0 8px 25px rgba(255,152,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-match-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .quick-match-btn:hover::before {
+            left: 100%;
+        }
+
+        .quick-match-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,152,0,0.4);
+        }
+
+        .quick-match-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .quick-match-info {
+            margin-top: 15px;
+            color: #aaa;
+            font-size: 0.95em;
+        }
+
+        .create-room-section {
+            padding: 25px;
+        }
+
+        .create-room-section h2 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff9800;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 2px solid rgba(255,152,0,0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 20px rgba(255,152,0,0.3);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .form-group select option {
+            background: var(--primary-dark);
+            color: #fff;
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .password-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .password-toggle label {
+            margin: 0;
+            cursor: pointer;
+            color: #e0e0e0;
+        }
+
+        .password-input-group {
+            display: none;
+        }
+
+        .password-input-group.show {
+            display: block;
+            margin-top: 15px;
+        }
+
+        .create-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            box-shadow: 0 6px 20px rgba(76,175,80,0.3);
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(76,175,80,0.4);
+        }
+
+        .join-room-section {
+            padding: 25px;
+        }
+
+        .join-room-section h2 {
+            text-align: center;
+        }
+
+        .join-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            box-shadow: 0 6px 20px rgba(33,150,243,0.3);
+        }
+
+        .join-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(33,150,243,0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .matching-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .matching-overlay.hidden {
+            display: none;
+        }
+
+        .matching-content {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+            border-radius: 20px;
+            border: 3px solid #ff9800;
+            box-shadow: 0 0 50px rgba(255,152,0,0.3);
+        }
+
+        .matching-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255,152,0,0.3);
+            border-radius: 50%;
+            border-top-color: #ff9800;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 25px;
+        }
+
+        .matching-text {
+            font-size: 1.5em;
+            color: #ffb74d;
+            margin-bottom: 10px;
+        }
+
+        .matching-timer {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+
+        .cancel-match-btn {
+            margin-top: 25px;
+            padding: 12px 30px;
+            font-size: 1em;
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .cancel-match-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(244,67,54,0.4);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(76,175,80,0.9), rgba(76,175,80,0.8));
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(244,67,54,0.9), rgba(244,67,54,0.8));
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, rgba(33,150,243,0.9), rgba(33,150,243,0.8));
+        }
+
+        @media (max-width: 1200px) {
+            .lobby-body {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .center-panel {
+                grid-column: 1 / -1;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lobby-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .lobby-body {
+                grid-template-columns: 1fr;
+            }
+
+            .room-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .room-players, .room-status {
+                justify-self: start;
+            }
+        }
+
+        .room-list::-webkit-scrollbar,
+        .player-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .room-list::-webkit-scrollbar-track,
+        .player-list::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+
+        .room-list::-webkit-scrollbar-thumb,
+        .player-list::-webkit-scrollbar-thumb {
+            background: rgba(255,152,0,0.5);
+            border-radius: 10px;
+        }
+
+        .room-list::-webkit-scrollbar-thumb:hover,
+        .player-list::-webkit-scrollbar-thumb:hover {
+            background: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="lobby-container">
+        <header class="lobby-header">
+            <h1>💎 Splendor 多人对战大厅</h1>
+            <div class="header-info">
+                <div class="online-count">
+                    <span class="online-dot"></span>
+                    <span>在线: <span id="online-count">0</span> 人</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <span class="user-name" id="user-name">未登录</span>
+                </div>
+                <a href="index.html" class="back-btn">🏠 返回主页</a>
+            </div>
+        </header>
+
+        <div class="lobby-body">
+            <section class="lobby-section room-list-section">
+                <h2>
+                    <span class="section-header">
+                        <span>🏠 房间列表</span>
+                        <button class="refresh-btn" id="refresh-rooms-btn">🔄 刷新</button>
+                    </span>
+                </h2>
+                <div class="room-list" id="room-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏠</div>
+                        <p>暂无房间，创建一个开始游戏吧！</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lobby-section center-panel">
+                <div class="lobby-section quick-match-section">
+                    <h2>⚡ 快速匹配</h2>
+                    <button class="quick-match-btn" id="quick-match-btn">
+                        🎮 快速匹配
+                    </button>
+                    <p class="quick-match-info">自动加入有空位的房间，快速开始游戏！</p>
+                </div>
+
+                <div class="lobby-section create-room-section">
+                    <h2>➕ 创建房间</h2>
+                    <div class="form-group">
+                        <label>房间名称</label>
+                        <input type="text" id="room-name-input" placeholder="我的 Splendor 房间" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>玩家人数</label>
+                        <select id="room-players-select">
+                            <option value="2">2 人</option>
+                            <option value="3">3 人</option>
+                            <option value="4" selected>4 人</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="password-toggle">
+                            <input type="checkbox" id="need-password">
+                            <label for="need-password">🔒 设置房间密码</label>
+                        </div>
+                        <div class="password-input-group" id="password-input-group">
+                            <input type="password" id="room-password" placeholder="输入房间密码" maxlength="20">
+                        </div>
+                    </div>
+                    <button class="create-btn" id="create-room-btn">🎯 创建房间</button>
+                </div>
+
+                <div class="lobby-section join-room-section">
+                    <h2>🔑 加入房间</h2>
+                    <div class="form-group">
+                        <label>房间 ID</label>
+                        <input type="text" id="join-room-id-input" placeholder="输入 8 位房间 ID" maxlength="8">
+                    </div>
+                    <button class="join-btn" id="join-room-btn">🚀 加入房间</button>
+                </div>
+            </section>
+
+            <section class="lobby-section player-list-section">
+                <h2>
+                    <span class="section-header">
+                        <span>👥 在线玩家</span>
+                        <button class="refresh-btn" id="refresh-players-btn">🔄 刷新</button>
+                    </span>
+                </h2>
+                <div class="player-list" id="player-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <p>暂无其他在线玩家</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="matching-overlay hidden" id="matching-overlay">
+        <div class="matching-content">
+            <div class="matching-spinner"></div>
+            <div class="matching-text">正在匹配中...</div>
+            <div class="matching-timer">已等待: <span id="match-timer">0</span> 秒</div>
+            <button class="cancel-match-btn" id="cancel-match-btn">取消匹配</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        class LobbyManager {
+            constructor() {
+                this.ws = null;
+                this.playerId = null;
+                this.playerName = null;
+                this.rooms = [];
+                this.players = [];
+                this.isMatching = false;
+                this.matchTimer = 0;
+                this.matchInterval = null;
+                this.serverUrl = 'ws://localhost:3000';
+                
+                this.init();
+            }
+
+            init() {
+                this.promptName();
+                this.initEventListeners();
+                this.connect();
+            }
+
+            promptName() {
+                let name = localStorage.getItem('splendor_player_name');
+                if (!name) {
+                    name = prompt('请输入你的昵称：') || '玩家' + Math.floor(Math.random() * 10000);
+                    localStorage.setItem('splendor_player_name', name);
+                }
+                this.playerName = name;
+                document.getElementById('user-name').textContent = name;
+                document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+            }
+
+            initEventListeners() {
+                document.getElementById('refresh-rooms-btn').addEventListener('click', () => this.refreshRooms());
+                document.getElementById('refresh-players-btn').addEventListener('click', () => this.refreshPlayers());
+                document.getElementById('quick-match-btn').addEventListener('click', () => this.quickMatch());
+                document.getElementById('create-room-btn').addEventListener('click', () => this.createRoom());
+                document.getElementById('join-room-btn').addEventListener('click', () => this.joinRoomById());
+                document.getElementById('cancel-match-btn').addEventListener('click', () => this.cancelMatch());
+                
+                document.getElementById('need-password').addEventListener('change', (e) => {
+                    document.getElementById('password-input-group').classList.toggle('show', e.target.checked);
+                });
+
+                document.getElementById('join-room-id-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.joinRoomById();
+                });
+
+                document.getElementById('room-name-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.createRoom();
+                });
+            }
+
+            connect() {
+                try {
+                    this.ws = new WebSocket(this.serverUrl);
+                    
+                    this.ws.onopen = () => {
+                        console.log('已连接到服务器');
+                        this.send({ type: 'set_name', name: this.playerName });
+                        this.send({ type: 'get_rooms' });
+                        this.send({ type: 'get_players' });
+                    };
+                    
+                    this.ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        this.handleMessage(data);
+                    };
+                    
+                    this.ws.onclose = () => {
+                        console.log('连接已关闭');
+                        this.showNotification('与服务器断开连接', 'error');
+                    };
+                    
+                    this.ws.onerror = (error) => {
+                        console.error('WebSocket 错误:', error);
+                        this.showNotification('无法连接到服务器', 'error');
+                    };
+                } catch (e) {
+                    console.log('服务器连接失败，使用模拟数据');
+                    this.loadMockData();
+                }
+            }
+
+            send(data) {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.ws.send(JSON.stringify(data));
+                }
+            }
+
+            handleMessage(data) {
+                switch (data.type) {
+                    case 'name_set':
+                        this.playerId = data.playerId;
+                        break;
+                    case 'rooms_list':
+                        this.rooms = data.rooms;
+                        this.renderRooms();
+                        break;
+                    case 'players_list':
+                        this.players = data.players;
+                        this.renderPlayers();
+                        document.getElementById('online-count').textContent = data.players.length;
+                        break;
+                    case 'room_created':
+                        this.onRoomCreated(data);
+                        break;
+                    case 'joined_room':
+                        this.onJoinedRoom(data);
+                        break;
+                    case 'match_found':
+                        this.onMatchFound(data);
+                        break;
+                    case 'invited':
+                        this.onInvited(data);
+                        break;
+                    case 'error':
+                        this.showNotification(data.message, 'error');
+                        break;
+                }
+            }
+
+            refreshRooms() {
+                this.send({ type: 'get_rooms' });
+                this.showNotification('房间列表已刷新', 'info');
+            }
+
+            refreshPlayers() {
+                this.send({ type: 'get_players' });
+                this.showNotification('玩家列表已刷新', 'info');
+            }
+
+            renderRooms() {
+                const container = document.getElementById('room-list');
+                
+                if (this.rooms.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏠</div>
+                            <p>暂无房间，创建一个开始游戏吧！</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.rooms.map(room => `
+                    <div class="room-item ${room.currentPlayers >= room.maxPlayers ? 'full' : ''}" 
+                         data-room-id="${room.roomId}"
+                         onclick="lobby.joinRoom('${room.roomId}')">
+                        <div class="room-info">
+                            <div class="room-name">${this.escapeHtml(room.name)}</div>
+                            <div class="room-id">ID: ${room.roomId}</div>
+                        </div>
+                        <div class="room-players">
+                            👥 ${room.currentPlayers}/${room.maxPlayers}
+                        </div>
+                        <div class="room-status ${room.status}">
+                            ${room.status === 'waiting' ? '等待中' : '游戏中'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderPlayers() {
+                const container = document.getElementById('player-list');
+                
+                const otherPlayers = this.players.filter(p => p.id !== this.playerId);
+                
+                if (otherPlayers.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>暂无其他在线玩家</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = otherPlayers.map(player => `
+                    <div class="player-item" data-player-id="${player.id}">
+                        <div class="player-avatar-small">${player.name.charAt(0).toUpperCase()}</div>
+                        <div class="player-details">
+                            <div class="player-name-small">${this.escapeHtml(player.name)}</div>
+                            <div class="player-status-small ${player.inGame ? 'in-game' : ''}">
+                                ${player.inGame ? '🎮 游戏中' : '🟢 在线'}
+                            </div>
+                        </div>
+                        ${!player.inGame ? `
+                            <button class="invite-btn" onclick="lobby.invitePlayer('${player.id}')">
+                                📨 邀请
+                            </button>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+
+            quickMatch() {
+                this.isMatching = true;
+                this.matchTimer = 0;
+                document.getElementById('matching-overlay').classList.remove('hidden');
+                this.send({ type: 'quick_match' });
+                
+                this.matchInterval = setInterval(() => {
+                    this.matchTimer++;
+                    document.getElementById('match-timer').textContent = this.matchTimer;
+                }, 1000);
+            }
+
+            cancelMatch() {
+                this.isMatching = false;
+                document.getElementById('matching-overlay').classList.add('hidden');
+                this.send({ type: 'cancel_match' });
+                
+                if (this.matchInterval) {
+                    clearInterval(this.matchInterval);
+                    this.matchInterval = null;
+                }
+            }
+
+            createRoom() {
+                const name = document.getElementById('room-name-input').value.trim() || 'Splendor 房间';
+                const maxPlayers = parseInt(document.getElementById('room-players-select').value);
+                const needPassword = document.getElementById('need-password').checked;
+                const password = document.getElementById('room-password').value;
+
+                if (needPassword && !password) {
+                    this.showNotification('请输入房间密码', 'error');
+                    return;
+                }
+
+                this.send({
+                    type: 'create_room',
+                    roomName: name,
+                    maxPlayers,
+                    password: needPassword ? password : null
+                });
+            }
+
+            joinRoom(roomId) {
+                const room = this.rooms.find(r => r.roomId === roomId);
+                
+                if (!room) {
+                    this.showNotification('房间不存在', 'error');
+                    return;
+                }
+
+                if (room.currentPlayers >= room.maxPlayers) {
+                    this.showNotification('房间已满', 'error');
+                    return;
+                }
+
+                if (room.status === 'playing') {
+                    this.showNotification('游戏已开始，无法加入', 'error');
+                    return;
+                }
+
+                if (room.hasPassword) {
+                    const password = prompt('请输入房间密码：');
+                    if (!password) return;
+                    this.send({ type: 'join_room', roomId, password });
+                } else {
+                    this.send({ type: 'join_room', roomId });
+                }
+            }
+
+            joinRoomById() {
+                const roomId = document.getElementById('join-room-id-input').value.trim().toUpperCase();
+                
+                if (!roomId || roomId.length !== 8) {
+                    this.showNotification('请输入正确的 8 位房间 ID', 'error');
+                    return;
+                }
+
+                this.joinRoom(roomId);
+            }
+
+            invitePlayer(playerId) {
+                this.send({ type: 'invite_player', playerId });
+                this.showNotification('已发送邀请', 'info');
+            }
+
+            onRoomCreated(data) {
+                this.showNotification(`房间创建成功！ID: ${data.roomId}`, 'info');
+                window.location.href = `index.html?room=${data.roomId}`;
+            }
+
+            onJoinedRoom(data) {
+                this.showNotification('成功加入房间！', 'info');
+                window.location.href = `index.html?room=${data.roomId}`;
+            }
+
+            onMatchFound(data) {
+                this.isMatching = false;
+                document.getElementById('matching-overlay').classList.add('hidden');
+                
+                if (this.matchInterval) {
+                    clearInterval(this.matchInterval);
+                    this.matchInterval = null;
+                }
+
+                this.showNotification('匹配成功！正在进入房间...', 'info');
+                setTimeout(() => {
+                    window.location.href = `index.html?room=${data.roomId}`;
+                }, 1000);
+            }
+
+            onInvited(data) {
+                const join = confirm(`${data.fromName} 邀请你加入房间 ${data.roomId}，是否加入？`);
+                if (join) {
+                    this.send({ type: 'join_room', roomId: data.roomId });
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            loadMockData() {
+                this.rooms = [
+                    { roomId: 'ABCD1234', name: '新手房间', currentPlayers: 2, maxPlayers: 4, status: 'waiting', hasPassword: false },
+                    { roomId: 'EFGH5678', name: '高手对决', currentPlayers: 4, maxPlayers: 4, status: 'playing', hasPassword: false },
+                    { roomId: 'IJKL9012', name: '私人房间', currentPlayers: 1, maxPlayers: 2, status: 'waiting', hasPassword: true }
+                ];
+
+                this.players = [
+                    { id: 'p1', name: this.playerName, inGame: false },
+                    { id: 'p2', name: '小明', inGame: false },
+                    { id: 'p3', name: '游戏达人', inGame: true },
+                    { id: 'p4', name: '宝石收藏家', inGame: false }
+                ];
+
+                this.playerId = 'p1';
+                document.getElementById('online-count').textContent = this.players.length;
+                this.renderRooms();
+                this.renderPlayers();
+            }
+        }
+
+        const lobby = new LobbyManager();
+    </script>
+</body>
+</html>

@@ -618,4 +618,16 @@ class SplendorGame {
       goldCount: this.goldCount
     };
   }
+
+  // 获取游戏状态（用于多人游戏）
+  getGameState() {
+    return {
+      currentPlayer: this.currentPlayer,
+      players: this.players,
+      gameBoard: this.gameBoard,
+      gameOver: this.gameOver,
+      winner: this.winner,
+      winnerDetermined: this.winnerDetermined
+    };
+  }
 }

@@ -1,10 +1,12 @@
 // Splendor Game UI Controller - 原版规则
 
 class SplendorUI {
-    constructor(playerCount) {
+    constructor(playerCount, isMultiplayer = false, playerId = null) {
         this.game = new SplendorGame(playerCount);
         this.selectedGems = [];
         this.selectedCard = null;
+        this.isMultiplayer = isMultiplayer;
+        this.playerId = playerId;
         this.init();
     }
 
@@ -64,11 +66,16 @@ class SplendorUI {
         ['tier1', 'tier2', 'tier3'].forEach(tier => {
             const container = document.getElementById(`${tier}-container`);
             if (!container) return;
-            container.innerHTML = '';
+            
+            // 使用 DocumentFragment 减少 DOM 操作
+            const fragment = document.createDocumentFragment();
             this.game.gameBoard[tier].forEach(card => {
                 const cardEl = this.createCardElement(card, tier);
-                container.appendChild(cardEl);
+                fragment.appendChild(cardEl);
             });
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
         });
     }
 
@@ -131,25 +138,32 @@ class SplendorUI {
         this.game.players.forEach((player, index) => {
             const section = document.getElementById(`player-${index}`);
             if (section) {
-                section.classList.toggle('active', index === this.game.currentPlayer);
+                // 只在需要时更新 active 类，避免不必要的 DOM 操作
+                const isActive = index === this.game.currentPlayer;
+                if (isActive !== section.classList.contains('active')) {
+                    section.classList.toggle('active', isActive);
+                }
             }
 
             // 更新得分
             const pointsEl = document.getElementById(`p${index}-points`);
-            if (pointsEl) pointsEl.textContent = player.points;
+            if (pointsEl && pointsEl.textContent !== player.points.toString()) {
+                pointsEl.textContent = player.points;
+            }
 
             // 更新卡牌数量
             const cardsCountEl = document.getElementById(`p${index}-cards-count`);
-            if (cardsCountEl) cardsCountEl.textContent = player.cards.length;
+            if (cardsCountEl && cardsCountEl.textContent !== player.cards.length.toString()) {
+                cardsCountEl.textContent = player.cards.length;
+            }
 
             // 更新宝石
             const gemsContainer = document.getElementById(`p${index}-gems`);
             if (gemsContainer) {
-                gemsContainer.innerHTML = '';
-                const gemNames = { white: '⚪白', blue: '🔵蓝', green: '🟢绿', red: '🔴红', black: '⚫黑', gold: '🟡金' };
+                let gemsHtml = '';
                 for (const [color, count] of Object.entries(player.gems)) {
                     if (count > 0) {
-                        gemsContainer.innerHTML += `
+                        gemsHtml += `
                             <div class="player-gem">
                                 <span class="gem gem-${color}" style="width:25px;height:25px;"></span>
                                 <span>${count}</span>
@@ -157,52 +171,72 @@ class SplendorUI {
                         `;
                     }
                 }
+                if (gemsContainer.innerHTML !== gemsHtml) {
+                    gemsContainer.innerHTML = gemsHtml;
+                }
             }
 
             // 更新折扣
             const bonusesContainer = document.getElementById(`p${index}-bonuses`);
             if (bonusesContainer) {
-                const gemNames = { white: '⚪', blue: '🔵', green: '🟢', red: '🔴', black: '⚫' };
-                let html = '<div class="bonus-label">💎 折扣：</div><div class="player-bonuses-list">';
+                let bonusesHtml = '<div class="bonus-label">💎 折扣：</div><div class="player-bonuses-list">';
+                let hasBonuses = false;
                 for (const [color, count] of Object.entries(player.bonuses)) {
                     if (count > 0) {
-                        html += `<span class="bonus-item"><span class="gem gem-${color}" style="width:18px;height:18px;display:inline-block;"></span>×${count}</span>`;
+                        bonusesHtml += `<span class="bonus-item"><span class="gem gem-${color}" style="width:18px;height:18px;display:inline-block;"></span>×${count}</span>`;
+                        hasBonuses = true;
                     }
                 }
-                if (html.includes('💎')) {
-                    html += '</div>';
-                    bonusesContainer.innerHTML = html;
+                if (hasBonuses) {
+                    bonusesHtml += '</div>';
                 } else {
-                    bonusesContainer.innerHTML = '<div class="bonus-label">💎 折扣：无</div>';
+                    bonusesHtml = '<div class="bonus-label">💎 折扣：无</div>';
+                }
+                if (bonusesContainer.innerHTML !== bonusesHtml) {
+                    bonusesContainer.innerHTML = bonusesHtml;
                 }
             }
 
             // 更新已购卡牌
             const cardsContainer = document.getElementById(`p${index}-cards`);
             if (cardsContainer) {
-                cardsContainer.innerHTML = '';
+                let cardsHtml = '';
                 if (player.cards.length === 0) {
-                    cardsContainer.innerHTML = '<div class="no-cards">暂无卡牌</div>';
+                    cardsHtml = '<div class="no-cards">暂无卡牌</div>';
                 } else {
+                    // 使用 DocumentFragment 减少 DOM 操作
+                    const fragment = document.createDocumentFragment();
                     player.cards.forEach(card => {
                         const cardEl = this.createCardElement(card, `tier${card.tier}`);
                         cardEl.style.width = '70px';
                         cardEl.style.height = '100px';
                         cardEl.style.padding = '5px';
                         cardEl.style.fontSize = '0.7em';
-                        cardsContainer.appendChild(cardEl);
+                        fragment.appendChild(cardEl);
                     });
+                    cardsContainer.innerHTML = '';
+                    cardsContainer.appendChild(fragment);
+                    return; // 提前结束本次循环，跳过下面的 HTML 比较
+                }
+                if (cardsContainer.innerHTML !== cardsHtml) {
+                    cardsContainer.innerHTML = cardsHtml;
                 }
             }
 
             // 更新预留卡牌
             const reservedContainer = document.getElementById(`p${index}-reserved`);
             if (reservedContainer) {
-                reservedContainer.innerHTML = '';
                 if (player.reservedCards.length > 0) {
-                    reservedContainer.innerHTML = '<div class="reserved-label">🃏 预留卡牌：</div>';
+                    // 使用 DocumentFragment 减少 DOM 操作
+                    const fragment = document.createDocumentFragment();
+                    const reservedLabel = document.createElement('div');
+                    reservedLabel.className = 'reserved-label';
+                    reservedLabel.textContent = '🃏 预留卡牌：';
+                    fragment.appendChild(reservedLabel);
+                    
                     const reservedDiv = document.createElement('div');
                     reservedDiv.className = 'player-reserved-list';
+                    
                     player.reservedCards.forEach(card => {
                         const cardEl = this.createCardElement(card, `tier${card.tier}`);
                         cardEl.style.width = '70px';
@@ -228,7 +262,12 @@ class SplendorUI {
                         cardWrapper.appendChild(buyBtn);
                         reservedDiv.appendChild(cardWrapper);
                     });
-                    reservedContainer.appendChild(reservedDiv);
+                    
+                    fragment.appendChild(reservedDiv);
+                    reservedContainer.innerHTML = '';
+                    reservedContainer.appendChild(fragment);
+                } else if (reservedContainer.innerHTML !== '') {
+                    reservedContainer.innerHTML = '';
                 }
             }
         });
@@ -236,7 +275,10 @@ class SplendorUI {
         // 更新当前玩家显示
         const currentPlayerEl = document.getElementById('current-player');
         if (currentPlayerEl) {
-            currentPlayerEl.innerHTML = `🎯 玩家 ${this.game.currentPlayer + 1} 的回合`;
+            const newText = `🎯 玩家 ${this.game.currentPlayer + 1} 的回合`;
+            if (currentPlayerEl.innerHTML !== newText) {
+                currentPlayerEl.innerHTML = newText;
+            }
         }
     }
 
@@ -373,6 +415,13 @@ class SplendorUI {
             return;
         }
 
+        // 添加宝石拿取动画
+        const gemSlot = document.querySelector(`.gem-slot[data-color="${color}"]`);
+        if (gemSlot) {
+            gemSlot.classList.add('picked');
+            setTimeout(() => gemSlot.classList.remove('picked'), 500);
+        }
+
         this.selectedGems.push(color);
         
         // 显示当前选择
@@ -442,6 +491,13 @@ class SplendorUI {
     buyCard(card) {
         const result = this.game.buyCard(this.game.currentPlayer, card);
         if (result.success) {
+            // 添加卡牌购买动画
+            const cardElement = document.querySelector(`[data-card-id="${card.id}"]`);
+            if (cardElement) {
+                cardElement.classList.add('purchased');
+                setTimeout(() => cardElement.classList.remove('purchased'), 800);
+            }
+            
             this.updateMessage(`🎉 玩家 ${this.game.currentPlayer + 1} 购买了卡牌！获得 ${card.points}分`);
             this.checkWinner();
             this.endTurn();
@@ -456,6 +512,19 @@ class SplendorUI {
     buyReservedCard(cardId) {
         const result = this.game.buyReservedCard(this.game.currentPlayer, cardId);
         if (result.success) {
+            // 添加预留卡牌购买动画
+            const playerIndex = this.game.currentPlayer;
+            const reservedContainer = document.getElementById(`p${playerIndex}-reserved`);
+            if (reservedContainer) {
+                const cardElements = reservedContainer.querySelectorAll('.card');
+                cardElements.forEach(cardEl => {
+                    if (cardEl.dataset.cardId === cardId) {
+                        cardEl.classList.add('purchased');
+                        setTimeout(() => cardEl.classList.remove('purchased'), 800);
+                    }
+                });
+            }
+            
             this.updateMessage(`🎉 玩家 ${this.game.currentPlayer + 1} 购买了预留卡牌！`);
             this.checkWinner();
             this.endTurn();
@@ -480,6 +549,15 @@ class SplendorUI {
         
         // 清除卡牌高亮
         document.querySelectorAll('.card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.2)');
+        
+        // 在多人游戏模式下发送回合结束消息
+        if (this.isMultiplayer && window.multiplayer) {
+            window.multiplayer.send({ 
+                type: 'game_action', 
+                action: 'end_turn',
+                gameState: this.game.getGameState()
+            });
+        }
         
         setTimeout(() => {
             this.renderPlayers();
@@ -525,48 +603,85 @@ class SplendorUI {
         this.confetti();
     }
 
-    // 简易彩带效果
+    // 游戏结束庆祝动画
     confetti() {
+        // 减少动画数量以提高性能
         const colors = ['#ffd700', '#ff6b6b', '#4fc3f7', '#81c784', '#ce93d8'];
-        for (let i = 0; i < 50; i++) {
+        
+        // 限制彩带数量，使用 requestAnimationFrame 优化性能
+        const confettiCount = 50; // 减少到 50 个
+        for (let i = 0; i < confettiCount; i++) {
             setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.style.cssText = `
-                    position: fixed;
-                    width: 10px;
-                    height: 10px;
-                    background: ${colors[Math.floor(Math.random() * colors.length)]};
-                    left: ${Math.random() * 100}vw;
-                    top: -10px;
-                    z-index: 9999;
-                    animation: fall ${2 + Math.random() * 2}s linear;
-                `;
-                document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 4000);
-            }, i * 50);
+                requestAnimationFrame(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${Math.random() * 8 + 4}px;
+                        height: ${Math.random() * 8 + 4}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}vw;
+                        top: -10px;
+                        z-index: 9999;
+                        animation: confettiFall ${2 + Math.random() * 2}s linear;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        pointer-events: none;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                });
+            }, i * 40); // 增加间隔时间
         }
         
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fall {
-                to {
-                    transform: translateY(100vh) rotate(720deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        // 限制烟花数量
+        const fireworkCount = 5; // 减少到 5 个
+        for (let i = 0; i < fireworkCount; i++) {
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    const firework = document.createElement('div');
+                    firework.style.cssText = `
+                        position: fixed;
+                        width: ${Math.random() * 15 + 8}px;
+                        height: ${Math.random() * 15 + 8}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}vw;
+                        top: ${Math.random() * 50}vh;
+                        z-index: 9999;
+                        animation: firework 1s ease-out;
+                        border-radius: 50%;
+                        pointer-events: none;
+                    `;
+                    document.body.appendChild(firework);
+                    setTimeout(() => firework.remove(), 1000);
+                });
+            }, i * 600); // 增加间隔时间
+        }
+        
+        // 胜利闪烁效果
+        const winnerModal = document.getElementById('game-over-modal');
+        if (winnerModal) {
+            winnerModal.style.animation = 'pulse 1s ease-in-out infinite';
+        }
     }
 
     // 更新消息
     updateMessage(msg) {
         const area = document.getElementById('message-area');
-        if (area) {
-            area.style.animation = 'none';
-            area.offsetHeight; // 触发重绘
-            area.style.animation = 'pulse 0.5s ease';
+        if (area && area.textContent !== msg) {
+            area.classList.add('updating');
             area.textContent = msg;
+            // 使用 requestAnimationFrame 优化动画
+            requestAnimationFrame(() => {
+                setTimeout(() => area.classList.remove('updating'), 300);
+            });
         }
+    }
+    
+    // 渲染整个游戏
+    renderGame() {
+        this.renderGemPool();
+        this.renderNobles();
+        this.renderCards();
+        this.renderPlayers();
     }
 }
 
@@ -727,7 +842,7 @@ function updateSetupInfo() {
 }
 
 // 开始游戏
-function startGame(playerCount) {
+function startGame(playerCount, isMultiplayer = false, playerId = null) {
     document.getElementById('setup-modal').classList.add('hidden');
-    gameUI = new SplendorUI(playerCount);
+    gameUI = new SplendorUI(playerCount, isMultiplayer, playerId);
 }
