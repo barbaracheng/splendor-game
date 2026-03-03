@@ -25,11 +25,14 @@ body {
     min-height: 100vh;
     padding: 15px;
     overflow-x: hidden;
+    max-width: 100vw;
 }
 
 .game-container {
     max-width: 1600px;
     margin: 0 auto;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* ===== Header ===== */
@@ -49,24 +52,26 @@ body {
 /* 游戏配置显示 */
 .game-config {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
-    padding: 15px;
+    padding: 12px;
     margin-bottom: 15px;
 }
 
 .config-item {
     background: rgba(255,215,0,0.1);
-    padding: 8px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
     border: 1px solid rgba(255,215,0,0.3);
     font-weight: bold;
+    white-space: nowrap;
+    font-size: 0.95em;
 }
 
 .config-item span {
     color: var(--primary-gold);
-    font-size: 1.2em;
+    font-size: 1.1em;
 }
 
 /* 卡牌图例说明 */
@@ -326,7 +331,9 @@ body {
     padding-bottom: 12px;
     border-bottom: 2px solid rgba(255,215,0,0.3);
     color: var(--primary-gold);
-    font-size: 1.5em;
+    font-size: 1.4em;
+    word-break: break-word;
+    max-width: 100%;
 }
 
 /* ===== Gem Pool ===== */
@@ -957,12 +964,20 @@ body {
     }
     
     .game-config {
-        gap: 10px;
+        gap: 8px;
     }
     
     .config-item {
-        padding: 6px 10px;
-        font-size: 0.9em;
+        padding: 5px 10px;
+        font-size: 0.85em;
+    }
+    
+    .section {
+        padding: 12px;
+    }
+    
+    .section h2, .section h3 {
+        font-size: 1.2em;
     }
 }
 
